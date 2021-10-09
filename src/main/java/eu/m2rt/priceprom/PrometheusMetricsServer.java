@@ -24,7 +24,7 @@ public final class PrometheusMetricsServer {
 
     public static PrometheusMetricsServer newInstance(String... symbols) throws IOException {
         return new PrometheusMetricsServer(
-                HttpServer.create(new InetSocketAddress("localhost", 8080), 0),
+                HttpServer.create(new InetSocketAddress("0.0.0.0", 8080), 0),
                 Arrays.stream(symbols)
                         .map(UrlYahooQuote::new)
                         .map(quote ->  new CachingYahooQuote(quote, Duration.ofSeconds(15)))
