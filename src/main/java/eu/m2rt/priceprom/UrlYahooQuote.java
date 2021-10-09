@@ -3,6 +3,8 @@ package eu.m2rt.priceprom;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 public final class UrlYahooQuote implements YahooQuote {
@@ -26,6 +28,11 @@ public final class UrlYahooQuote implements YahooQuote {
         try {
             final var epochTimeSeconds = epochTimeMillis / 1000;
             final var url = new URL(String.format(urlTemplate, epochTimeSeconds - 100, epochTimeSeconds));
+            System.out.printf(
+                    "%s - Fetching %s\n",
+                    DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
+                    url
+            );
             try (final var in = url.openStream()) {
                 final var body = new String(in.readAllBytes());
 

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,18 +39,28 @@ public final class PrometheusMetricsServer {
         server.createContext("/prometheus", handler);
         server.createContext("/", handler);
         server.start();
-        System.out.println("Started server on " + server.getAddress());
+        System.out.printf(
+                "%s - Started server on %s\n",
+                DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
+                server.getAddress()
+        );
     }
 
     private class PrometheusMetricsHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            final var body = new PrometheusMetricsBody(quotes).toString();
-            exchange.sendResponseHeaders(200, body.length());
+            try {
+                final var body = new PrometheusMetricsBody(quotes).toString();
+                exchange.sendResponseHeaders(200, body.length());
 
-            try (final var out = exchange.getResponseBody()) {
-                out.write(body.getBytes(StandardCharsets.UTF_8));
+                try (final var out = exchange.getResponseBody()) {
+                    out.write(body.getBytes(StandardCharsets.UTF_8));
+                }
+            } catch (RuntimeException e) {
+                e.printStackTrace(System.out);
+                exchange.sendResponseHeaders(500, 0);
+                exchange.close();
             }
         }
     }
