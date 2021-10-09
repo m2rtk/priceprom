@@ -27,7 +27,7 @@ public final class CachingYahooQuote implements YahooQuote {
     public double query() {
         final var now = Instant.now();
 
-        if (lastResult == null || lastQueryTime.plus(ttl).isAfter(now)) {
+        if (lastResult == null || now.isAfter(lastQueryTime.plus(ttl))) {
             this.lastResult = delegate.query();
             this.lastQueryTime = now;
         }
